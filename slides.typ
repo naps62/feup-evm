@@ -16,6 +16,8 @@
 
 #set text(size: 18pt)
 
+= EVM / Solidity intro
+
 == Hello, World
 
 #codly(
@@ -38,6 +40,8 @@ contract Counter {
   }
 }
 ```
+
+== Specification
 
 == Transaction encoding
 
@@ -65,12 +69,27 @@ contract Counter {
 )
 
 
-TODO
-
-
 == Transactional function calls
-#v(20pt)
 
-TODO
 
-==
+= Developer concepts
+
+== Permissions
+== Re-entrancy
+== Testing
+== Fork Testing
+== Anvil Cheatcodes
+
+= MEV (and other topics)
+
+== Flash boys (Wall street)
+
+== Flash boys 2.0
+
+== Frontrun attacks
+
+== Sandwich attacks
+
+== The Dark Forest
+
+== MEV
