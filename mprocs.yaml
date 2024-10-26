@@ -1,0 +1,6 @@
+procs:
+  slides-build:
+    cmd: ["typst", "watch", "slides.typ"]
+  slides:
+    cmd: ["zathura", "slides.main"]
+
