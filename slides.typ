@@ -204,21 +204,147 @@ https://book.getfoundry.sh/
 === Spawning a local test node from a mainnet fork:
 `$ anvil --fork-url $MAINNET_FORK_URL --fork-block-number 21070000`
 
+=== JSON-RPC call to a node:
+`$ cast rpc eth_blockNumber`
+
+=== Contract read call:
+`$ cast call $CONTRACT_ADDRESS "balanceOf(address)" $alice`
+
+== Testing
+
+```solidity
+import "forge-std/Test.sol";
+
+contract CounterTest is Test {
+  Counter counter;
+
+  function setUp() public {
+    counter = new Counter();
+  }
+
+  function testIncrement() public {
+    counter.increment();
+    assertEq(counter.number(), 1);
+  }
+}
+```
+
+== Cheatcodes - block number
+
+```solidity
+import "forge-std/Test.sol";
+
+contract BlockNumberTest is Test {
+  function testBlockNumber() public {
+    assertEq(block.number, 1);
+    vm.roll(100);
+    assertEq(block.number, 100);
+  }
+
+  function testBlockTimestamp() public {
+    assertEq(block.timestamp, 1);
+    vm.roll(100);
+    assertEq(block.timestamp, 100);
+  }
+}
+```
+
+== Cheatcodes - deal
+
+```solidity
+import "forge-std/Test.sol";
+
+contract DealTest is Test {
+  address constant alice = address(0x1111);
+
+  function testDeal() public {
+    deal(alice, 100);
+    assertEq(alice.balance, 100);
+  }
+}
+```
+
+== Cheatcodes - prank
+
+```solidity
+import "forge-std/Test.sol";
+
+contract PrankTest is Test {
+  address constant alice = address(0x1111);
+
+  function testPrank() public {
+    vm.expectRevert(bytes("Not the owner"));
+    contract.doSomething();
+
+    vm.startPrank(alice);
+    contract.doSomething();
+    vm.stopPrank();
+  }
+}
+```
 
 == Fork Testing
 
-=== Spawning a local test node:
+```solidity
+import "forge-std/Test.sol";
 
-`$ anvil`
+contract ForkTest is Test {
+  address constant realWallet = address(0x123);
 
+  function testFork() public {
+    vm.createSelectFork("mainnet");
+    vm.rollFork(100);
 
+    assertEq(realWallet.balance, 1 ether);
+  }
+}
+```
 
 == Anvil Cheatcodes
 
 = MEV (and other topics)
 
 == Flash boys (Wall street)
+
+#figure(image("assets/flash-boys.png"))
+
 == Flash boys 2.0
+
+#figure(image("assets/flash-boys-2.png"))
+
 == Frontrun attacks
+
+- Alice wants to buy an NFT on sale for 1 ETH
+#pause
+
+- Alice submits a transaction to the public mempool, offering 60 gwei as gas price
+#pause
+
+- Bob is scanning the mempool, and detects this attempt
+#pause
+
+- Bob submits an equivalent transaction, but offering 61 gwei as gas price
+#pause
+
+- Bob's transaction is preferred, ends up included first
+#pause
+
+- Alice's transaction is still included, but reverts (sale is no longer available)
+
 == Sandwich attacks
+
+- ETH is currently worth \$100
+- Alice wants to sell 1 ETH at current market price (oversimplification, ask me later)
+- Alice submits a tx on Uniswap
+- Bob is running a validator node, and detects the attempt
+- Bob sees an arbitrage opportunity:
+  - Bob sells 10 ETH for \$1000 , driving price down to \$99
+  - Alice tx gets included, ends up receiving only \$99
+  - Bob buys back 10 ETH for \$990
+
+Bob profits \$10, alice receives \$1 less than expected
+
+
 == The Dark Forest
+
+#figure(image("assets/dark-forest.jpg"))
