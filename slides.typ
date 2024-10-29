@@ -121,14 +121,98 @@ There is no no parallelism, txs are strictly ordered within a block.
 
 The formal process of proposing new features or standards for EVM contracts. Some examples:
 
-=== EIP-20
+== EIP-20 - Token Standard
 
-- EIP-155: include chainId in transaction payload (avoid replay attacks)
+```solidity
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    // ...
+}
+```
+
+== ERC20 Sample Implementation
+
+```solidity
+contract ERC20 is IERC20 {
+    uint256 public totalSupply;
+    mapping (address => uint256) private _balances;
+
+    // ...
+}
+```
+
+#pagebreak()
+
+```solidity
+contract ERC20 is IERC20 {
+    // ...
+
+    function balanceOf(address account) public view returns (uint256) {
+        return _balances[account];
+    }
+    function transfer(address recipient, uint256 amount) public returns (bool) {
+        _transfer(msg.sender, recipient, amount);
+        return true;
+    }
+    // ...
+}
+```
+
+== EIP-721 - Non-Fungible Token Standard
+
+```solidity
+interface IERC721 {
+    function balanceOf(address owner) external view returns (uint256 balance);
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function transferFrom(address from, address to, uint256 tokenId) external;
+```
 
 == Permissions
+
+```solidity
+contract PermissionedToken is ERC20 {
+  mapping(address => bool) public whitelisted;
+
+  function transfer(address to, uint256 value) public {
+    require(whitelisted[msg.sender], "Not whitelisted");
+    super.transfer(to, value);
+  }
+}
+```
+
 == Re-entrancy
-== Testing
+
+== Building & Testing
+
+=== Foundry
+
+https://book.getfoundry.sh/
+
+- #strong[`anvil`]: a test node
+- #strong[`cast`]: CLI tool for interacting with EVM chains or data
+- #strong[`forge`]: build & test smart contracts
+- #strong[`chisel`]: Solidity REPL
+
+== Anvil
+
+=== Spawning a local test node from a mainnet fork:
+`$ anvil --fork-url $MAINNET_FORK_URL --fork-block-number 21070000`
+
+
 == Fork Testing
+
+=== Spawning a local test node:
+
+`$ anvil`
+
+
+
 == Anvil Cheatcodes
 
 = MEV (and other topics)
