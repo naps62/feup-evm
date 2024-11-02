@@ -31,7 +31,13 @@ contract Counter {
   uint256 public value;
 
   constructor(uint256 _v) {
-    v = _v
+    value = _v
+  }
+
+  function add(uint256 _x) external returns (uint256) {
+    value += _x;
+    return value;
+  }
 }
 ```
 
@@ -82,11 +88,11 @@ contract Counter {
 
 ```json
 {
-  "to": "",
+  "to": "", // no destination implies contract creation
+  "data": "0x6080604052...", // init code for the contract
   "value": "0x100",
   "gas": "0x100000",
   "gasPrice": "0x100",
-  "data": "0x6080604052...", // init code for the contract
   "nonce": "0x1",
   "chainId": "0x1"
 }
@@ -96,11 +102,11 @@ contract Counter {
 
 ```json
 {
-  "to": "0x0000000000000000000000000000000000002",
+  "to": "0x0000000000000000000000000000000000002", // contract address
+  "data": "0x6080604052...", // calldata, as seen earlier
   "value": "0x100",
   "gas": "0x100000",
   "gasPrice": "0x100",
-  "data": "0x6080604052...", // calldata
   "nonce": "0x2",
   "chainId": "0x1"
 }
@@ -114,6 +120,81 @@ All transactions are atomic, and will  either:
 There is no no parallelism, txs are strictly ordered within a block.
 
 
+= Language details
+
+== Types
+
+```solidity
+contract Types {
+  uint256 x = 1;
+  uint8 = 2;
+  address alice = 0x1f9090aaE28b8a3dCeaDf281B0F12828e676c326;
+  Counter counter = Counter(alice);
+
+  Counter[] counters;
+  mapping(uint256 => Counter) countersByIndex;
+
+  struct Name {
+    address addr;
+    string name;
+  }
+  Name[] names;
+}
+```
+
+== Memory Types
+
+```solidity
+contract Types2 {
+  // constants
+  uint256 public constant MAX_UINT256 = type(uint256).max;
+
+  // contract storage, part of EVM's state
+  uint256 private x;
+
+  function increment() public {
+    // in-memory stack, discarded after function execution
+    uint256 tmp = x;
+
+    if (tmp == MAX_UINT256) {
+      revert("Overflow");
+    }
+
+    tmp += 1;
+  }
+```
+
+== Functions
+
+```solidity
+contract Functions {
+   // callable only as transaction calldata
+  function add(uint256 _x) external;
+
+  // callable both from a transaction and from within the contract
+  function mul(uint256 _x) public;
+
+  // only callable from within the contract
+  function sub(uint256 _x) internal;
+}
+```
+
+== Cross-contract calls
+
+```solidity
+interface Counter {
+  function increment() external;
+}
+
+contract Caller {
+  Counter counter;
+
+  function incrementCounter() external {
+    counter.increment();
+  }
+}
+
+```
 
 = Developer concepts
 
