@@ -16,8 +16,6 @@
 
 #set text(size: 18pt)
 
-= EVM / Solidity intro
-
 == About me
 
 - #strong[naps62]
@@ -25,6 +23,9 @@
 - helped found and build Utrust (2017-2020)
 - smart contract developer / auditor since 2019
 - building #strong[ethui.dev], a wallet for Ethereum developers
+
+= EVM / Solidity intro
+
 
 == Hello, World
 
