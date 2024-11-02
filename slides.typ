@@ -18,6 +18,14 @@
 
 = EVM / Solidity intro
 
+== About me
+
+- #strong[naps62]
+- #strong[subvisual.com], a venture studio, since 2012 #emph[we're hiring!]
+- helped found and build Utrust (2017-2020)
+- smart contract developer / auditor since 2019
+- building #strong[ethui.dev], a wallet for Ethereum developers
+
 == Hello, World
 
 #codly(
@@ -267,7 +275,30 @@ contract PermissionedToken is ERC20 {
 }
 ```
 
-== Re-entrancy
+== EIP-155
+
+#strong[Simple replay attack protection]
+
+Enforcing inclusion of chainId in transaction payload. prevents signed transactions from being replayed on other chains.
+
+== Commit-reveal schemes
+
+```solidity
+contract CommitReveal {
+  bytes32 public commitment;
+  uint256 public value;
+
+  function commit(bytes32 hashedValue) public {
+    commitment = hashedValue;
+  }
+
+  function reveal(uint256 _value, bytes32 salt) public {
+    assertEq(keccak256(abi.encode(_value, salt)), commitment);
+    require(_value == commitment, "Not the commitment");
+    value = _value;
+  }
+}
+```
 
 == Building & Testing
 
@@ -280,7 +311,32 @@ https://book.getfoundry.sh/
 - #strong[`forge`]: build & test smart contracts
 - #strong[`chisel`]: Solidity REPL
 
-== Anvil
+== Forge
+
+=== Build contracts
+`$ forge build`
+
+=== Format code
+`$ forge fmt`
+
+=== Run a deploy script
+`$ forge script script/Counter.s.sol:CounterScript --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast`
+
+== Forge testing
+
+=== Watch file changes and run tests
+`forge test --watch`
+
+=== See stack traces for failed tests
+`forge test -vvv`
+
+=== Run a single test
+`forge test --match-test test_SetNumber`
+
+=== Run a single test file
+`forge test --match-path test/Counter.t.sol`
+
+== Anvil / Cast
 
 === Spawning a local test node from a mainnet fork:
 `$ anvil --fork-url $MAINNET_FORK_URL --fork-block-number 21070000`
@@ -290,6 +346,9 @@ https://book.getfoundry.sh/
 
 === Contract read call:
 `$ cast call $CONTRACT_ADDRESS "balanceOf(address)" $alice`
+
+=== Give yourself some free ETH
+`cast rpc anvil_setBalance $ADDRESS 0x1000000000000000000`
 
 == Testing
 
@@ -381,8 +440,6 @@ contract ForkTest is Test {
 }
 ```
 
-== Anvil Cheatcodes
-
 = MEV (and other topics)
 
 == Flash boys (Wall street)
@@ -429,3 +486,34 @@ Bob profits \$10, alice receives \$1 less than expected
 == The Dark Forest
 
 #figure(image("assets/dark-forest.jpg"))
+
+== Ethereum is a Dark Forest
+
+#quote(block: true, attribution: strong[https://www.paradigm.xyz/2020/08/ethereum-is-a-dark-forest])[Arbitrage bots typically look for specific types of transactions in the mempool [...] and try to frontrun them according to a predetermined algorithm. Generalized frontrunners look for any transaction that they could profitably frontrun by copying it and replacing addresses with their own.
+
+[...]
+
+To try to extract the money without alerting the bots, I would need to obfuscate the transaction so that the call to the Uniswap pair couldn’t be detected
+]
+
+= Other References (for the curious)
+
+== Uniswap V2
+
+#set text(size: 30pt)
+$ x y = k $
+
+#figure(image("assets/univ2.jpg"))
+
+== Flashbots
+
+#set text(size: 20pt)
+Private mempool for MEV and white-hat arbitrage
+
+== Vyper
+
+A python-based EVM language. Alternative to Solidity
+
+(other more esoteric languages: YUL, Huff, Fe)
+
+= Thank you!
