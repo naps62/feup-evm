@@ -31,6 +31,7 @@
               solc
               typst
               typstyle
+              pdfpc
             ];
           };
       }
